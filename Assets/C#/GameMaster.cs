@@ -31,10 +31,12 @@ public class GameMaster : MonoBehaviour
             //Detect clicked game world object
             Vector2 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             targetCollider = Physics2D.OverlapPoint(clickPosition);
+            var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
 
             if (targetCollider != null)
             {
                 target = targetCollider.gameObject;
+                Debug.Log("clicked"  + targetCollider.gameObject.name);
             }
             else
             {
@@ -103,6 +105,8 @@ public class GameMaster : MonoBehaviour
             List<Vector3> targetPositionList = GetPositionListAround(moveToPosition, new float[] { 0.2f, 0.4f, 0.6f }, new int[] { 5, 10, 20 });
             int targetPositionListIndex = 0;
 
+            Debug.Log(moveToPosition);
+
             foreach (Unit unit in selectedUnitList)
             {
                 unit.MoveTo(targetPositionList[targetPositionListIndex]);
@@ -111,7 +115,6 @@ public class GameMaster : MonoBehaviour
                 if(target != null)
                 {
                     unit.target = target;
-                    Debug.Log(target);
                 }
                 else
                 {

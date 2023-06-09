@@ -48,8 +48,9 @@ public class Unit : MonoBehaviour
 
         Flip();
         AutoHarvest();
-        
 
+    
+      
     }
 
     public void MoveTo(Vector2 targetPositon)
@@ -92,14 +93,8 @@ public class Unit : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Stop velocity?
-        if (rigidbody != null)
-        {
-            MoveTo(transform.position);
-        }
-
         //Ignore other units
-        if (collision.gameObject.tag == "Unit")
+        if (collision.gameObject.tag == "Unit" || collision.gameObject.tag == "Lumber")
         {
             Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
         }
