@@ -136,13 +136,22 @@ public class Unit : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision) //Account for already touching object
     {
-        //Lumber Harvesting
+        //Harvesting
         if (collision.gameObject.tag == "Lumber")
         {
             if (target == collision.gameObject)
             {
                 currentNode = collision.gameObject; //Set active node
                 StartCoroutine(HarvestResource());
+            }
+        }
+
+        //Harvesting
+        if (collision.gameObject.tag == "Home")
+        {
+            if (hasResource)
+            {
+                StartCoroutine(StoreResource());
             }
         }
     }
