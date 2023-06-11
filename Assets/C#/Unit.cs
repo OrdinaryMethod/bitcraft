@@ -93,8 +93,9 @@ public class Unit : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Collided with: " + collision.gameObject.name);
         //Ignore other units
-        if (collision.gameObject.tag == "Unit" || collision.gameObject.tag == "Lumber")
+        if (collision.gameObject.tag == "Unit")
         {
             Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
         }
@@ -103,11 +104,10 @@ public class Unit : MonoBehaviour
         if (collision.gameObject.tag == "Lumber" && target == collision.gameObject)
         {
             currentNode = collision.gameObject; //Set active node
-
+          
             if (!hasResource)
             {
                 StartCoroutine(HarvestResource());
-                //agent.velocity = new Vector2(0,0);
             }
         }
 
@@ -117,7 +117,6 @@ public class Unit : MonoBehaviour
             if (hasResource)
             {
                 StartCoroutine(StoreResource());
-                //agent.velocity = new Vector2(0, 0);
             }
         }
     }
