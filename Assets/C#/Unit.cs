@@ -25,7 +25,7 @@ public class Unit : MonoBehaviour
 
     //What this specific unit can do
     [SerializeField] private GameObject currentNode;
-    [SerializeField] private bool hasResource;
+    public bool hasResource;
 
     private void Awake()
     {
@@ -93,7 +93,6 @@ public class Unit : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Collided with: " + collision.gameObject.name);
         //Ignore other units
         if (collision.gameObject.tag == "Unit")
         {
@@ -159,7 +158,6 @@ public class Unit : MonoBehaviour
 
     IEnumerator HarvestResource()
     {
-        Debug.Log("harvesting");
         yield return new WaitForSeconds(1.5f);
         
         hasResource = true;
@@ -167,8 +165,6 @@ public class Unit : MonoBehaviour
 
     IEnumerator StoreResource()
     {
-        Debug.Log("storing");
-
         yield return new WaitForSeconds(1.5f);
        
         hasResource = false;
