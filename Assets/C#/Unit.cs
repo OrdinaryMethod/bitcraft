@@ -11,21 +11,27 @@ public class Unit : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private NavMeshAgent agent;
 
-    public bool inCombat; //handle attacks
+    [SerializeField] private Transform searchPos;
+    [SerializeField] private float searchRange;
+    [SerializeField] private LayerMask nodeLayer;
 
+    public bool inCombat; //handle attacks
     public bool isMelee;
     public bool isRange;
-
     public int damage;
 
+    [SerializeField] private List<GameObject> nearbyNodes;
+
     //Base variables
-    [SerializeField] private GameObject homeBase;
+    public GameObject homeBase;
     public GameObject target;
     public Vector3 defaultPosition;
+    private bool canFlip;
 
     //What this specific unit can do
-    [SerializeField] private GameObject currentNode;
+    public GameObject currentNode;
     public bool hasResource;
+    public bool isHarvestingNode = false;
 
     private void Awake()
     {
@@ -33,9 +39,13 @@ public class Unit : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         rigidbody = GetComponent<Rigidbody2D>();
         agent = GetComponent<NavMeshAgent>();
+        nearbyNodes = new List<GameObject>();
 
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+
+        canFlip = true;
+        isHarvestingNode = false;
     }
 
     private void Update()
@@ -43,14 +53,15 @@ public class Unit : MonoBehaviour
         //Find base at all times
         if(homeBase == null)
         {
-            homeBase = GameObject.FindGameObjectWithTag("Home");
+            homeBase = GameObject.FindGameObjectWithTag("Home"); //make this refresh to nearest home base
         }
 
-        Flip();
-        AutoHarvest();
-
-    
-      
+        if(canFlip)
+        {
+            Flip();
+        }
+        
+        AutoHarvestNode();
     }
 
     public void MoveTo(Vector2 targetPositon)
@@ -58,11 +69,10 @@ public class Unit : MonoBehaviour
         agent.SetDestination(targetPositon);
     }
 
-    private void AutoHarvest()
+    private void AutoHarvestNode()
     {
-        if (target)
+        if (target && isHarvestingNode)
         {
-            //Auto Gather if target still a node
             if (hasResource && target == currentNode)
             {
                 MoveTo(homeBase.transform.position);
@@ -72,12 +82,35 @@ public class Unit : MonoBehaviour
                 MoveTo(target.transform.position);
             }
         }
+        else if(!target && isHarvestingNode)
+        {
+            Collider2D[] nodeCollider = Physics2D.OverlapCircleAll(searchPos.position, searchRange, nodeLayer);
+
+            int newNode = 0;
+
+            if(nodeCollider.Length > 0)
+            {
+                float dist = Vector3.Distance(nodeCollider[newNode].transform.position, transform.position);
+
+
+                for (int i = 0; i < nodeCollider.Length; i++)
+                {
+                    if (dist >= Vector3.Distance(nodeCollider[i].transform.position, transform.position))
+                    {
+                        newNode = i;
+                    }
+                }
+
+                target = nodeCollider[newNode].gameObject;
+                currentNode = nodeCollider[newNode].gameObject;
+            }        
+        }
     }
 
     private void Flip()
     {
         // Check the sign of the velocity to determine the direction
-        float velocityX = GetComponent<Rigidbody2D>().velocity.x;
+        float velocityX = agent.velocity.x;
         float direction = Mathf.Sign(velocityX);
 
         // Flip the sprite based on the direction
@@ -99,14 +132,14 @@ public class Unit : MonoBehaviour
             Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
         }
 
-        //Lumber Harvesting
-        if (collision.gameObject.tag == "Lumber" && target == collision.gameObject)
+        //Harvesting
+        if (collision.gameObject.tag == "Node" && target == collision.gameObject)
         {
             currentNode = collision.gameObject; //Set active node
           
             if (!hasResource)
             {
-                StartCoroutine(HarvestResource());
+                StartCoroutine(HarvestResource(collision.gameObject));
             }
         }
 
@@ -136,12 +169,12 @@ public class Unit : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision) //Account for already touching object
     {
         //Harvesting
-        if (collision.gameObject.tag == "Lumber")
+        if (collision.gameObject.tag == "Node")
         {
             if (target == collision.gameObject)
             {
                 currentNode = collision.gameObject; //Set active node
-                StartCoroutine(HarvestResource());
+                StartCoroutine(HarvestResource(collision.gameObject));
             }
         }
 
@@ -155,11 +188,12 @@ public class Unit : MonoBehaviour
         }
     }
 
-
-    IEnumerator HarvestResource()
+    IEnumerator HarvestResource(GameObject node)
     {
+        canFlip = false;
         yield return new WaitForSeconds(1.5f);
-        
+        canFlip = true;
+        node.GetComponent<Node>().health -= 1;
         hasResource = true;
     }
 
@@ -168,6 +202,12 @@ public class Unit : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
        
         hasResource = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(searchPos.position, searchRange);
     }
 
 }

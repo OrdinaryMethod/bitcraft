@@ -20,29 +20,8 @@ public class GameMaster : MonoBehaviour
 
     private void Update()
     {
-        GetTarget();
         SelectUnits();
         CommandUnits();  
-    }
-    private void GetTarget()
-    {
-        if(Input.GetMouseButtonUp(1))
-        {
-            //Detect clicked game world object
-            Vector2 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            targetCollider = Physics2D.OverlapPoint(clickPosition);
-            var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
-
-            if (targetCollider != null)
-            {
-                target = targetCollider.gameObject;
-                Debug.Log("clicked"  + targetCollider.gameObject.name);
-            }
-            else
-            {
-                target = null;
-            }
-        }
     }
 
     private void SelectUnits()
@@ -100,25 +79,54 @@ public class GameMaster : MonoBehaviour
     {
         if (Input.GetMouseButtonUp(1))
         {
+            //Detect clicked game world object
+            Vector2 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            targetCollider = Physics2D.OverlapPoint(clickPosition);
+            var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
+
+            if (targetCollider != null && targetCollider.gameObject.tag != "Unit") //Change this to a new value when enemies implemented
+            {
+                target = targetCollider.gameObject;
+                Debug.Log("You click on: " + targetCollider.gameObject.name);
+            }
+            else
+            {
+                target = null;
+            }
+
             //Basic movement
             Vector3 moveToPosition = UtilsClass.GetMouseWorldPosition();
             List<Vector3> targetPositionList = GetPositionListAround(moveToPosition, new float[] { 0.2f, 0.4f, 0.6f }, new int[] { 5, 10, 20 });
             int targetPositionListIndex = 0;
 
-            Debug.Log(moveToPosition);
-
             foreach (Unit unit in selectedUnitList)
             {
-                unit.MoveTo(targetPositionList[targetPositionListIndex]);
-                targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
+                
 
-                if(target != null)
+                if(target) //no formation
+                {               
+                        unit.MoveTo(moveToPosition);                                 
+                }
+                else //formation
+                {
+                    unit.MoveTo(targetPositionList[targetPositionListIndex]);
+                    targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
+                }
+
+
+                if (target)
                 {
                     unit.target = target;
+
+                    if (target.tag == "Node")
+                    {
+                        unit.isHarvestingNode = true;
+                    }
                 }
                 else
                 {
                     unit.target = null;
+                    unit.isHarvestingNode = false;
                 }
        
                 
