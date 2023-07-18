@@ -5,12 +5,17 @@ using CodeMonkey.Utils;
 
 public class GameMaster : MonoBehaviour
 {
+    public GameMasterData gameMasterData;
+
     private Vector3 startPosition;
     [SerializeField] private List<Unit> selectedUnitList;
     [SerializeField] private Transform selectedAreaTransform;
 
     public GameObject target;
     Collider2D targetCollider;
+
+    public int lumberTotal;
+
 
     private void Awake()
     {

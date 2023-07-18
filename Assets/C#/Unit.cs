@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class Unit : MonoBehaviour
 {
+    private GameMaster gameMaster;
+
     private IMovePosition movePosition;
     private Rigidbody2D rigidbody;
 
@@ -33,6 +35,9 @@ public class Unit : MonoBehaviour
     public bool hasResource;
     public bool isHarvestingNode = false;
 
+    //Report status
+    [SerializeField] private GameObject statusBubble;
+
     private void Awake()
     {
         movePosition = GetComponent<IMovePosition>();
@@ -40,6 +45,8 @@ public class Unit : MonoBehaviour
         rigidbody = GetComponent<Rigidbody2D>();
         agent = GetComponent<NavMeshAgent>();
         nearbyNodes = new List<GameObject>();
+
+        gameMaster = GameObject.Find("GameMaster").GetComponent<GameMaster>();
 
         agent.updateRotation = false;
         agent.updateUpAxis = false;
@@ -60,8 +67,17 @@ public class Unit : MonoBehaviour
         {
             Flip();
         }
-        
-        AutoHarvestNode();
+
+        try
+        {
+            AutoHarvestNode();
+            ReportStatus();
+        }
+        catch(System.Exception e)
+        {
+
+        }
+           
     }
 
     public void MoveTo(Vector2 targetPositon)
@@ -104,6 +120,18 @@ public class Unit : MonoBehaviour
                 target = nodeCollider[newNode].gameObject;
                 currentNode = nodeCollider[newNode].gameObject;
             }        
+        }
+    }
+
+    private void ReportStatus()
+    {
+        if(hasResource)
+        {
+            statusBubble.SetActive(true);
+        }
+        else
+        {
+            statusBubble.SetActive(false);
         }
     }
 
@@ -193,14 +221,20 @@ public class Unit : MonoBehaviour
         canFlip = false;
         yield return new WaitForSeconds(1.5f);
         canFlip = true;
-        node.GetComponent<Node>().health -= 1;
-        hasResource = true;
+        if(node)
+        {
+            if(target == node)
+            {
+                node.GetComponent<Node>().health -= 1;
+                hasResource = true;
+            }           
+        }   
     }
 
     IEnumerator StoreResource()
     {
         yield return new WaitForSeconds(1.5f);
-       
+        gameMaster.gameMasterData.lumberCount++;
         hasResource = false;
     }
 

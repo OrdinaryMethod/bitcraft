@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Home : MonoBehaviour
 {
+    private GameMaster gameMaster;
 
     private List<GameObject> units;
 
@@ -12,6 +13,8 @@ public class Home : MonoBehaviour
     void Start()
     {
         units = new List<GameObject>();
+        gameMaster = GameObject.Find("GameMaster").GetComponent<GameMaster>();
+
     }
 
     // Update is called once per frame
@@ -27,6 +30,7 @@ public class Home : MonoBehaviour
                 units.Add(unit);           
         }
 
+        //all monitoring scripting here
         ResourceCheck();
 
         //clear list
@@ -43,7 +47,11 @@ public class Home : MonoBehaviour
             float dist = Vector3.Distance(unit.transform.position, transform.position);
             if(dist <= 0.75)
             {
-                unit.GetComponent<Unit>().hasResource = false;
+                if(unit.GetComponent<Unit>().hasResource)
+                {
+                    unit.GetComponent<Unit>().hasResource = false;
+                    gameMaster.gameMasterData.lumberCount++;
+                }           
             }
         }
     }

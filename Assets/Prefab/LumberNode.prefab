@@ -138,3 +138,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 5
   empty: 0
+  nodeType: 0

@@ -7,10 +7,12 @@ public class Node : MonoBehaviour
     public int health;
     public bool empty;
 
-    // Start is called before the first frame update
-    void Start()
+    public NodeType nodeType;
+
+    public enum NodeType
     {
-    
+        Lumber,
+        Carrion
     }
 
     private void Update()
@@ -25,10 +27,5 @@ public class Node : MonoBehaviour
             Destroy(gameObject);
         }
 
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        
-    }
+    }  
 }
