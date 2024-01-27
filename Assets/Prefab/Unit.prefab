@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 141091244}
   - component: {fileID: 141091245}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Light 2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 317494013}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AttackPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 1597490173}
   - component: {fileID: 1597490172}
   - component: {fileID: 1597490174}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SelectionArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,7 +251,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1776262163}
   - component: {fileID: 1776262164}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,7 +334,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6425238672782424139}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Resource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,7 +367,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8404144127003842190}
   - component: {fileID: 5139485204377984111}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Lumber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -451,7 +451,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8841976325310156322}
   - component: {fileID: 976547450595282057}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StatusBubble
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -539,10 +539,9 @@ GameObject:
   - component: {fileID: 8459332732518281851}
   - component: {fileID: 8459332732518281850}
   - component: {fileID: 1666530692}
-  - component: {fileID: 1666530690}
-  - component: {fileID: 1666530691}
   - component: {fileID: 135721191}
-  m_Layer: 0
+  - component: {fileID: 1831934806}
+  m_Layer: 7
   m_Name: Unit
   m_TagString: Unit
   m_Icon: {fileID: 0}
@@ -653,6 +652,7 @@ MonoBehaviour:
   nodeLayer:
     serializedVersion: 2
     m_Bits: 64
+  isEnemy: 0
   inCombat: 0
   isMelee: 1
   isRange: 0
@@ -686,31 +686,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &1666530690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8459332732518281862}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd073a70bb20ed44c88320df4ac63d1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1666530691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8459332732518281862}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9e5782865ad33b43a92f59d2c10c1b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 0.5
 --- !u!195 &135721191
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -720,7 +695,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 8459332732518281862}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.01
+  m_Radius: 0.05
   m_Speed: 0.5
   m_Acceleration: 8
   avoidancePriority: 99
@@ -733,3 +708,23 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1831934806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8459332732518281862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54461e065dccd7745b1d11c727e4474d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitHealth: 5
+  unitDamage: 1
+  searchPos: {fileID: 317494013}
+  searchRange: 0.1
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  setAttackCooldown: 2

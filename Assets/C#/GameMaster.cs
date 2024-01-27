@@ -16,6 +16,11 @@ public class GameMaster : MonoBehaviour
 
     public int lumberTotal;
 
+    public TextAlignment phaseDisplayText;
+    private Touch theTouch;
+    private float timeTouchEnded;
+    
+
 
     private void Awake()
     {
@@ -25,19 +30,23 @@ public class GameMaster : MonoBehaviour
 
     private void Update()
     {
-        SelectUnits();
-        CommandUnits();  
+        //SelectUnits_PC();
+
+        
+        SelectUnits_Mobile();
+        //CommandUnits_Mobile();
+
     }
 
-    private void SelectUnits()
+    private void SelectUnits_PC()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             selectedAreaTransform.gameObject.SetActive(true);
             startPosition = UtilsClass.GetMouseWorldPosition();
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(1))
         {
             Vector3 currentMousePos = UtilsClass.GetMouseWorldPosition();
             Vector3 lowerLeft = new Vector3(
@@ -54,7 +63,7 @@ public class GameMaster : MonoBehaviour
             selectedAreaTransform.localScale = upperRight - lowerLeft;
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(1))
         {
             selectedAreaTransform.gameObject.SetActive(false);
 
@@ -65,7 +74,7 @@ public class GameMaster : MonoBehaviour
             foreach (Collider2D collider2D in collider2dArray)
             {
                 Unit unit = collider2D.GetComponent<Unit>();
-                if (unit != null)
+                if (unit != null && !unit.isEnemy)
                 {
                     selectedUnitList.Add(unit);
 
@@ -80,16 +89,95 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    private void CommandUnits()
+    float initialFingersDistance;
+    Vector3 initialScale;
+    private float initialDistance;
+
+    private void SelectUnits_Mobile()
     {
-        if (Input.GetMouseButtonUp(1))
+
+        if (Input.touchCount == 2)
         {
+            Touch touch1 = Input.GetTouch(0);
+            Touch touch2 = Input.GetTouch(1);
+
+            float initialDistance = 1f;
+            // Get the initial scale of the selected area
+            Vector3 initialScale = new Vector3(); 
+
+            if (touch1.phase == TouchPhase.Began && touch2.phase == TouchPhase.Began)
+            {
+                selectedAreaTransform.gameObject.SetActive(true);
+            }
+            float currentDistance = 0f; // Declare and initialize currentDistance outside the loop
+
+            if (touch1.phase == TouchPhase.Moved && touch2.phase == TouchPhase.Moved)
+            {
+                float getDistance = Vector2.Distance(touch1.position, touch2.position);
+
+                if (getDistance > currentDistance || currentDistance == 0)
+                {
+                    currentDistance = getDistance;
+                    Debug.Log("Increasing scale");
+
+                    // Increase scale by a certain factor
+                    float scaleFactor = 0.2f; // Adjust this value as needed
+
+                    Vector3 scale = selectedAreaTransform.localScale * scaleFactor;
+                    selectedAreaTransform.localScale = new Vector3(scale.x, scale.y);
+                }
+                //else
+                //{
+                //    Debug.Log("Decreasing scale");
+
+                //    // Decrease scale by a certain factor
+                //    float scaleFactor = 0.9f; // Adjust this value as needed
+
+                //    Vector3 scale = selectedAreaTransform.localScale * scaleFactor;
+                //    selectedAreaTransform.localScale = new Vector3(scale.x, scale.y, 1f);
+                //}
+
+                Vector2 middlePosition = (touch1.position + touch2.position) / 2f;
+
+                // Convert the screen position to world position
+                Vector3 middlePositionWorld = Camera.main.ScreenToWorldPoint(new Vector3(middlePosition.x, middlePosition.y, 10f));
+
+                // Set the position of the selected area transform
+                selectedAreaTransform.position = new Vector3(middlePositionWorld.x, middlePositionWorld.y, 0f);
+
+            }
+
+            if (touch1.phase == TouchPhase.Ended && touch2.phase == TouchPhase.Ended)
+            {
+                Debug.Log("Both fingers released");
+                selectedAreaTransform.gameObject.SetActive(false);
+                selectedAreaTransform.localScale = new Vector2(0,0);
+            }
+        }
+        else
+        {
+            selectedAreaTransform.gameObject.SetActive(false);
+            selectedAreaTransform.localScale = new Vector3(1, 1);
+        }
+
+        // Note: Your code for handling selectedUnitList is placed outside the touch input handling and will execute regardless of touch input.
+        // Ensure that this behavior is intended.
+        foreach (Unit unit in selectedUnitList)
+        {
+            unit.GetComponentInChildren<SelectionArea>().isSelected = true;
+        }
+
+
+    }
+
+    private void CommandUnits_Mobile()
+    {
             //Detect clicked game world object
             Vector2 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             targetCollider = Physics2D.OverlapPoint(clickPosition);
             var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
 
-            if (targetCollider != null && targetCollider.gameObject.tag != "Unit") //Change this to a new value when enemies implemented
+            if (targetCollider != null)
             {
                 target = targetCollider.gameObject;
                 Debug.Log("You click on: " + targetCollider.gameObject.name);
@@ -105,9 +193,7 @@ public class GameMaster : MonoBehaviour
             int targetPositionListIndex = 0;
 
             foreach (Unit unit in selectedUnitList)
-            {
-                
-
+            {            
                 if(target) //no formation
                 {               
                         unit.MoveTo(moveToPosition);                                 
@@ -136,7 +222,6 @@ public class GameMaster : MonoBehaviour
        
                 
             }
-        }
     }
 
     //Unit coordination

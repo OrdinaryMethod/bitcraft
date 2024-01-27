@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -17,6 +18,7 @@ public class Unit : MonoBehaviour
     [SerializeField] private float searchRange;
     [SerializeField] private LayerMask nodeLayer;
 
+    public bool isEnemy;
     public bool inCombat; //handle attacks
     public bool isMelee;
     public bool isRange;
@@ -24,19 +26,20 @@ public class Unit : MonoBehaviour
 
     [SerializeField] private List<GameObject> nearbyNodes;
 
-    //Base variables
     public GameObject homeBase;
     public GameObject target;
     public Vector3 defaultPosition;
     private bool canFlip;
+    public bool canMove;
 
-    //What this specific unit can do
     public GameObject currentNode;
     public bool hasResource;
     public bool isHarvestingNode = false;
+    private bool seekNewNode = false;
 
     //Report status
     [SerializeField] private GameObject statusBubble;
+
 
     private void Awake()
     {
@@ -53,6 +56,7 @@ public class Unit : MonoBehaviour
 
         canFlip = true;
         isHarvestingNode = false;
+        canMove = true;
     }
 
     private void Update()
@@ -70,14 +74,22 @@ public class Unit : MonoBehaviour
 
         try
         {
-            AutoHarvestNode();
+       
             ReportStatus();
+            AutoHarvestNode();
+            StopMovement();   
         }
         catch(System.Exception e)
         {
-
+           
         }
            
+    }
+
+    private class newNode
+    {
+        public float distance { get; set; }
+        public GameObject node { get; set; }
     }
 
     public void MoveTo(Vector2 targetPositon)
@@ -97,28 +109,71 @@ public class Unit : MonoBehaviour
             {
                 MoveTo(target.transform.position);
             }
+
+            //FindClosestNode();
         }
-        else if(!target && isHarvestingNode)
+        else if(!target && isHarvestingNode) //Move on to next node if available
         {
+            Debug.Log("triggered");
+
             Collider2D[] nodeCollider = Physics2D.OverlapCircleAll(searchPos.position, searchRange, nodeLayer);
 
-            int newNode = 0;
-
+            //keept checking nodes
             if(nodeCollider.Length > 0)
             {
-                float dist = Vector3.Distance(nodeCollider[newNode].transform.position, transform.position);
 
+                newNode _newNode = new newNode();
+                
+
+                List<newNode> nodeList = new List<newNode>();
 
                 for (int i = 0; i < nodeCollider.Length; i++)
                 {
-                    if (dist >= Vector3.Distance(nodeCollider[i].transform.position, transform.position))
+                    float dist = Vector3.Distance(nodeCollider[i].transform.position, transform.position);
+
+                    newNode node = new newNode();
+                    node.distance = dist;
+                    node.node = nodeCollider[i].gameObject;
+
+
+
+                    nodeList.Add(node);
+
+
+
+                        //newNode = i;
+
+
+                     
+                }
+
+                Debug.Log(nodeList.Count());
+
+
+                newNode closestNode = new newNode();
+                float previousDist = 0;
+
+                foreach(newNode n in nodeList)
+                {
+                    if(n.distance < closestNode.distance || closestNode.distance == 0)
                     {
-                        newNode = i;
+
+
+                        closestNode = n;
+                        Debug.Log("considered: " + closestNode.node + " dist: " + closestNode.distance);
                     }
                 }
 
-                target = nodeCollider[newNode].gameObject;
-                currentNode = nodeCollider[newNode].gameObject;
+
+
+                target = closestNode.node;
+                currentNode = closestNode.node;
+
+                Debug.Log("selected: " + target.name);
+
+                nodeList.Clear();
+
+
             }        
         }
     }
@@ -135,6 +190,23 @@ public class Unit : MonoBehaviour
         }
     }
 
+    private void StopMovement()
+    {
+        //Always move towards target
+
+        if (target.GetComponent<Unit>())
+        {
+            MoveTo(target.transform.position);
+            inCombat = true;
+        }
+
+        //check to make sure target is not enemy and reset can move
+        if (!target.GetComponent<Unit>() || (isHarvestingNode || hasResource))
+        {
+            canMove = true;
+        }
+    }
+    
     private void Flip()
     {
         // Check the sign of the velocity to determine the direction
@@ -170,28 +242,6 @@ public class Unit : MonoBehaviour
                 StartCoroutine(HarvestResource(collision.gameObject));
             }
         }
-
-        if (collision.gameObject.tag == "Home")
-        {
-
-            if (hasResource)
-            {
-                StartCoroutine(StoreResource());
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision) 
-    {
-        //if(collision.gameObject.tag == "Lumber")
-        //{
-        //    StopCoroutine(HarvestLumber());
-        //}
-
-        //if(collision.gameObject.tag == "Home")
-        //{
-        //    StopCoroutine(StoreLumber());
-        //}
     }
 
     private void OnCollisionStay2D(Collision2D collision) //Account for already touching object
@@ -203,15 +253,6 @@ public class Unit : MonoBehaviour
             {
                 currentNode = collision.gameObject; //Set active node
                 StartCoroutine(HarvestResource(collision.gameObject));
-            }
-        }
-
-        //Harvesting
-        if (collision.gameObject.tag == "Home")
-        {
-            if (hasResource)
-            {
-                StartCoroutine(StoreResource());
             }
         }
     }
@@ -231,17 +272,9 @@ public class Unit : MonoBehaviour
         }   
     }
 
-    IEnumerator StoreResource()
-    {
-        yield return new WaitForSeconds(1.5f);
-        gameMaster.gameMasterData.lumberCount++;
-        hasResource = false;
-    }
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(searchPos.position, searchRange);
     }
-
 }
