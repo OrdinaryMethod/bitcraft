@@ -151,7 +151,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1597490173}
   - component: {fileID: 1597490172}
-  - component: {fileID: 1597490174}
   m_Layer: 7
   m_Name: SelectionArea
   m_TagString: Untagged
@@ -227,20 +226,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1597490174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1597490171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2aa3e76f7b5af04c98a73f3a437d2ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectedArea: {fileID: 1776262162}
-  isSelected: 0
 --- !u!1 &1776262162
 GameObject:
   m_ObjectHideFlags: 0
@@ -652,6 +637,7 @@ MonoBehaviour:
   nodeLayer:
     serializedVersion: 2
     m_Bits: 64
+  selectedArea: {fileID: 1776262162}
   isEnemy: 0
   inCombat: 0
   isMelee: 1
@@ -661,10 +647,12 @@ MonoBehaviour:
   homeBase: {fileID: 0}
   target: {fileID: 0}
   defaultPosition: {x: 0, y: 0, z: 0}
+  canMove: 0
   currentNode: {fileID: 0}
   hasResource: 0
   isHarvestingNode: 0
   statusBubble: {fileID: 5050415090285205770}
+  unitType: 0
 --- !u!50 &1666530692
 Rigidbody2D:
   serializedVersion: 4

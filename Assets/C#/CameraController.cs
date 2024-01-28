@@ -5,12 +5,13 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public float dragSpeed = 2; // Speed of camera movement
+    public bool canMove;
 
     void Update()
     {
 
        
-        if (Input.touchCount > 0) // If there are touches on the screen
+        if (Input.touchCount > 0 && canMove) // If there are touches on the screen
         {
             HandleTouchInput();
         }

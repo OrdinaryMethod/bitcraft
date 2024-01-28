@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnitListEnums;
 
 public class Unit : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class Unit : MonoBehaviour
     [SerializeField] private Transform searchPos;
     [SerializeField] private float searchRange;
     [SerializeField] private LayerMask nodeLayer;
+    public GameObject selectedArea;
 
     public bool isEnemy;
     public bool inCombat; //handle attacks
@@ -36,10 +38,12 @@ public class Unit : MonoBehaviour
     public bool hasResource;
     public bool isHarvestingNode = false;
     private bool seekNewNode = false;
+    public bool isSelected;
 
     //Report status
     [SerializeField] private GameObject statusBubble;
 
+    public UnitType unitType;
 
     private void Awake()
     {
@@ -51,6 +55,8 @@ public class Unit : MonoBehaviour
 
         gameMaster = GameObject.Find("GameMaster").GetComponent<GameMaster>();
 
+        selectedArea.SetActive(false);
+
         agent.updateRotation = false;
         agent.updateUpAxis = false;
 
@@ -61,8 +67,17 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
+        if (isSelected)
+        {
+            selectedArea.SetActive(true);
+        }
+        else
+        {
+            selectedArea.SetActive(false);
+        }
+
         //Find base at all times
-        if(homeBase == null)
+        if (homeBase == null)
         {
             homeBase = GameObject.FindGameObjectWithTag("Home"); //make this refresh to nearest home base
         }
@@ -114,7 +129,6 @@ public class Unit : MonoBehaviour
         }
         else if(!target && isHarvestingNode) //Move on to next node if available
         {
-            Debug.Log("triggered");
 
             Collider2D[] nodeCollider = Physics2D.OverlapCircleAll(searchPos.position, searchRange, nodeLayer);
 

@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-public class CommandEnums : MonoBehaviour
+public class CommandEnums
 {
     public static string move = "Move";
     public static string attack = "Attack";

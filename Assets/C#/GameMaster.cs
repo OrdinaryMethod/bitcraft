@@ -6,9 +6,10 @@ using CodeMonkey.Utils;
 public class GameMaster : MonoBehaviour
 {
     public GameMasterData gameMasterData;
+    private CameraController camera;
 
     private Vector3 startPosition;
-    [SerializeField] private List<Unit> selectedUnitList;
+    public List<Unit> selectedUnitList;
     [SerializeField] private Transform selectedAreaTransform;
 
     public GameObject target;
@@ -22,18 +23,19 @@ public class GameMaster : MonoBehaviour
 
     private float previousTouchDistance;
 
+    //Interface
 
     private void Awake()
     {
         selectedUnitList = new List<Unit>();
         selectedAreaTransform.gameObject.SetActive(false);
+        camera = GameObject.Find("Main Camera").GetComponent<CameraController>();
     }
 
     private void Update()
     {
         //SelectUnits_PC();
-
-        
+     
         SelectUnits_Mobile();
         CommandUnits_Mobile();
 
@@ -90,27 +92,14 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    float initialFingersDistance;
-    Vector3 initialScale;
-    private float initialDistance;
 
     private void SelectUnits_Mobile()
     {
+ 
 
         if (Input.touchCount == 2)
         {
-            // Check for units within the area
-            Collider2D[] colliders = Physics2D.OverlapAreaAll(selectedAreaTransform.position - selectedAreaTransform.localScale / 20f, selectedAreaTransform.position + selectedAreaTransform.localScale / 20f);
-            selectedUnitList.Clear();
-            foreach (Collider2D collider in colliders)
-            {
-                Unit unit = collider.GetComponent<Unit>();
-                if (unit != null && !unit.isEnemy)
-                {
-                    selectedUnitList.Add(unit);
-                }
-            }
-
+            camera.canMove = false;
             Touch touch1 = Input.GetTouch(0);
             Touch touch2 = Input.GetTouch(1);
 
@@ -161,28 +150,49 @@ public class GameMaster : MonoBehaviour
             }
 
             if (touch1.phase == TouchPhase.Ended && touch2.phase == TouchPhase.Ended)
-            {
+            {             
                 Debug.Log("Both fingers released");
+                // Check for units within the area
+                Collider2D[] colliders = Physics2D.OverlapAreaAll(selectedAreaTransform.position - selectedAreaTransform.localScale / 20f, selectedAreaTransform.position + selectedAreaTransform.localScale / 20f);
+                
+                foreach(Unit o in selectedUnitList)
+                {
+                    o.isSelected = false;
+                }
+                
+                
+                selectedUnitList.Clear();
+                foreach (Collider2D collider in colliders)
+                {
+                    Unit unit = collider.GetComponent<Unit>();
+                    if (unit != null && !unit.isEnemy)
+                    {
+                        if(selectedAreaTransform.gameObject.active)
+                        {
+                            selectedUnitList.Add(unit);
+                            unit.GetComponent<Unit>().isSelected = true;
+                        }
+                      
+                    }
+                }
+
                 selectedAreaTransform.gameObject.SetActive(false);
-                selectedAreaTransform.localScale = new Vector2(0, 0);        
+                selectedAreaTransform.localScale = new Vector2(0, 0);
             }
         }
         else
         {
             selectedAreaTransform.gameObject.SetActive(false);
             selectedAreaTransform.localScale = new Vector3(1, 1);
+
+            camera.canMove = true;
         }
 
 
 
 
 
-        // Note: Your code for handling selectedUnitList is placed outside the touch input handling and will execute regardless of touch input.
-        // Ensure that this behavior is intended.
-        foreach (Unit unit in selectedUnitList)
-        {
-            unit.GetComponentInChildren<SelectionArea>().isSelected = true;
-        }
+
 
 
     }
@@ -232,6 +242,8 @@ public class GameMaster : MonoBehaviour
                     if (target.tag == "Node")
                     {
                         unit.isHarvestingNode = true;
+                        //unit.isSelected = false;
+                    
                     }
                 }
                 else
