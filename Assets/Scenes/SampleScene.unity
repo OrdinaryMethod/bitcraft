@@ -38302,6 +38302,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7768791638683852589, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791638683852590, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791638683852590, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791638683852590, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7768791639015764954, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
       propertyPath: m_Name
       value: GameMaster
@@ -38348,6 +38364,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7768791639015764956, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791639852877163, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791639852877163, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791639852877163, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791639852877163, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7768791639852877163, guid: a1ae53c62670fe045897af270d168b4c, type: 3}
+      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7768791639852877164, guid: a1ae53c62670fe045897af270d168b4c, type: 3}

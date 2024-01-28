@@ -19,7 +19,8 @@ public class GameMaster : MonoBehaviour
     public TextAlignment phaseDisplayText;
     private Touch theTouch;
     private float timeTouchEnded;
-    
+
+    private float previousTouchDistance;
 
 
     private void Awake()
@@ -34,7 +35,7 @@ public class GameMaster : MonoBehaviour
 
         
         SelectUnits_Mobile();
-        //CommandUnits_Mobile();
+        CommandUnits_Mobile();
 
     }
 
@@ -98,44 +99,56 @@ public class GameMaster : MonoBehaviour
 
         if (Input.touchCount == 2)
         {
+            // Check for units within the area
+            Collider2D[] colliders = Physics2D.OverlapAreaAll(selectedAreaTransform.position - selectedAreaTransform.localScale / 20f, selectedAreaTransform.position + selectedAreaTransform.localScale / 20f);
+            selectedUnitList.Clear();
+            foreach (Collider2D collider in colliders)
+            {
+                Unit unit = collider.GetComponent<Unit>();
+                if (unit != null && !unit.isEnemy)
+                {
+                    selectedUnitList.Add(unit);
+                }
+            }
+
             Touch touch1 = Input.GetTouch(0);
             Touch touch2 = Input.GetTouch(1);
 
-            float initialDistance = 1f;
-            // Get the initial scale of the selected area
-            Vector3 initialScale = new Vector3(); 
+           float scaleSpeed = 1f;
 
             if (touch1.phase == TouchPhase.Began && touch2.phase == TouchPhase.Began)
             {
                 selectedAreaTransform.gameObject.SetActive(true);
             }
-            float currentDistance = 0f; // Declare and initialize currentDistance outside the loop
-
+ 
             if (touch1.phase == TouchPhase.Moved && touch2.phase == TouchPhase.Moved)
             {
                 float getDistance = Vector2.Distance(touch1.position, touch2.position);
 
-                if (getDistance > currentDistance || currentDistance == 0)
+                if (getDistance > previousTouchDistance)
                 {
-                    currentDistance = getDistance;
-                    Debug.Log("Increasing scale");
-
-                    // Increase scale by a certain factor
-                    float scaleFactor = 0.2f; // Adjust this value as needed
-
-                    Vector3 scale = selectedAreaTransform.localScale * scaleFactor;
-                    selectedAreaTransform.localScale = new Vector3(scale.x, scale.y);
+                    if(selectedAreaTransform.localScale.x < 20)
+                    {
+                        selectedAreaTransform.localScale = new Vector2(
+                             selectedAreaTransform.localScale.x + 1.5f,
+                             selectedAreaTransform.localScale.y + 1.5f
+                         );
+                    }              
                 }
-                //else
-                //{
-                //    Debug.Log("Decreasing scale");
+                else if (getDistance < previousTouchDistance)
+                {
+                    if (selectedAreaTransform.localScale.x > 0)
+                    {
+                        selectedAreaTransform.localScale = new Vector2(
+                             selectedAreaTransform.localScale.x - 1.5f,
+                             selectedAreaTransform.localScale.y - 1.5f
+                         );
+                    }
+                }
 
-                //    // Decrease scale by a certain factor
-                //    float scaleFactor = 0.9f; // Adjust this value as needed
+                previousTouchDistance = getDistance;
 
-                //    Vector3 scale = selectedAreaTransform.localScale * scaleFactor;
-                //    selectedAreaTransform.localScale = new Vector3(scale.x, scale.y, 1f);
-                //}
+
 
                 Vector2 middlePosition = (touch1.position + touch2.position) / 2f;
 
@@ -151,7 +164,7 @@ public class GameMaster : MonoBehaviour
             {
                 Debug.Log("Both fingers released");
                 selectedAreaTransform.gameObject.SetActive(false);
-                selectedAreaTransform.localScale = new Vector2(0,0);
+                selectedAreaTransform.localScale = new Vector2(0, 0);        
             }
         }
         else
@@ -159,6 +172,10 @@ public class GameMaster : MonoBehaviour
             selectedAreaTransform.gameObject.SetActive(false);
             selectedAreaTransform.localScale = new Vector3(1, 1);
         }
+
+
+
+
 
         // Note: Your code for handling selectedUnitList is placed outside the touch input handling and will execute regardless of touch input.
         // Ensure that this behavior is intended.
@@ -172,8 +189,11 @@ public class GameMaster : MonoBehaviour
 
     private void CommandUnits_Mobile()
     {
+        if (Input.touchCount == 1)
+        {
+            Touch touch1 = Input.GetTouch(0);
             //Detect clicked game world object
-            Vector2 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 clickPosition = Camera.main.ScreenToWorldPoint(touch1.position);
             targetCollider = Physics2D.OverlapPoint(clickPosition);
             var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
 
@@ -193,10 +213,10 @@ public class GameMaster : MonoBehaviour
             int targetPositionListIndex = 0;
 
             foreach (Unit unit in selectedUnitList)
-            {            
-                if(target) //no formation
-                {               
-                        unit.MoveTo(moveToPosition);                                 
+            {
+                if (target) //no formation
+                {
+                    unit.MoveTo(moveToPosition);
                 }
                 else //formation
                 {
@@ -219,9 +239,13 @@ public class GameMaster : MonoBehaviour
                     unit.target = null;
                     unit.isHarvestingNode = false;
                 }
-       
-                
+
+
             }
+        }
+
+
+        
     }
 
     //Unit coordination
