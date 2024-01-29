@@ -17,6 +17,9 @@ public class Interface : MonoBehaviour
 
     public List<GameObject> unitCards;
 
+    //Controls
+    public Button clearUnitBtn;
+
     //Data
     [SerializeField] private UnitCardData ghoulData;
 
@@ -33,6 +36,7 @@ public class Interface : MonoBehaviour
         lumberCount =  gameMaster.gameMasterData.lumberCount;
         lumberText.text = lumberCount.ToString();
 
+        //Assign unit cards ---
         foreach(GameObject unitCard in unitCards)
         {
             if(unitCard.GetComponent<UnitCard>().unitData != null)
@@ -57,10 +61,6 @@ public class Interface : MonoBehaviour
         {
             clearUnits.gameObject.SetActive(true);
         }
-
-
-
-
 
         foreach (Unit u in gameMaster.selectedUnitList)
         {
@@ -95,7 +95,14 @@ public class Interface : MonoBehaviour
                     break;
             }
         }
+        //---
 
+        clearUnitBtn.onClick.AddListener(ClearUnitCards);
+    }
+
+    public void ClearUnitCards()
+    {
+        gameMaster.selectedUnitList.Clear();
     }
 
 

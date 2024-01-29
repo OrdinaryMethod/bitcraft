@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey.Utils;
+using UnityEngine.EventSystems;
 
 public class GameMaster : MonoBehaviour
 {
@@ -95,7 +96,6 @@ public class GameMaster : MonoBehaviour
 
     private void SelectUnits_Mobile()
     {
- 
 
         if (Input.touchCount == 2)
         {
@@ -202,55 +202,61 @@ public class GameMaster : MonoBehaviour
         if (Input.touchCount == 1)
         {
             Touch touch1 = Input.GetTouch(0);
-            //Detect clicked game world object
-            Vector2 clickPosition = Camera.main.ScreenToWorldPoint(touch1.position);
-            targetCollider = Physics2D.OverlapPoint(clickPosition);
-            var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
 
-            if (targetCollider != null)
+            if(!IsTouchOverUITag(touch1.position, "Interface"))
             {
-                target = targetCollider.gameObject;
-                Debug.Log("You click on: " + targetCollider.gameObject.name);
-            }
-            else
-            {
-                target = null;
-            }
+                //Detect clicked game world object
+                Vector2 clickPosition = Camera.main.ScreenToWorldPoint(touch1.position);
+                targetCollider = Physics2D.OverlapPoint(clickPosition);
+                var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
 
-            //Basic movement
-            Vector3 moveToPosition = UtilsClass.GetMouseWorldPosition();
-            List<Vector3> targetPositionList = GetPositionListAround(moveToPosition, new float[] { 0.2f, 0.4f, 0.6f }, new int[] { 5, 10, 20 });
-            int targetPositionListIndex = 0;
-
-            foreach (Unit unit in selectedUnitList)
-            {
-                if (target) //no formation
+                if (targetCollider != null)
                 {
-                    unit.MoveTo(moveToPosition);
-                }
-                else //formation
-                {
-                    unit.MoveTo(targetPositionList[targetPositionListIndex]);
-                    targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
-                }
-
-
-                if (target)
-                {
-                    unit.target = target;
-
-                    if (target.tag == "Node")
-                    {
-                        unit.isHarvestingNode = true;
-                        //unit.isSelected = false;
-                    
-                    }
+                    target = targetCollider.gameObject;
+                    Debug.Log("You click on: " + targetCollider.gameObject.name);
                 }
                 else
                 {
-                    unit.target = null;
-                    unit.isHarvestingNode = false;
+                    target = null;
                 }
+
+                //Basic movement
+                Vector3 moveToPosition = UtilsClass.GetMouseWorldPosition();
+                List<Vector3> targetPositionList = GetPositionListAround(moveToPosition, new float[] { 0.2f, 0.4f, 0.6f }, new int[] { 5, 10, 20 });
+                int targetPositionListIndex = 0;
+
+                foreach (Unit unit in selectedUnitList)
+                {
+                    if (target) //no formation
+                    {
+                        unit.MoveTo(moveToPosition);
+                    }
+                    else //formation
+                    {
+                        unit.MoveTo(targetPositionList[targetPositionListIndex]);
+                        targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
+                    }
+
+
+                    if (target)
+                    {
+                        unit.target = target;
+
+                        if (target.tag == "Node")
+                        {
+                            unit.isHarvestingNode = true;
+                            //unit.isSelected = false;
+
+                        }
+                    }
+                    else
+                    {
+                        unit.target = null;
+                        unit.isHarvestingNode = false;
+                    }
+                }
+
+          
 
 
             }
@@ -259,6 +265,30 @@ public class GameMaster : MonoBehaviour
 
         
     }
+    private bool IsTouchOverUITag(Vector2 touchPosition, string tag)
+    {
+        // Create a PointerEventData to represent the touch input
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = touchPosition;
+
+        // Create a list to store the results of the raycast
+        List<RaycastResult> results = new List<RaycastResult>(); // Define and initialize the results list
+
+        // Perform a raycast into the screen from the touch position
+        EventSystem.current.RaycastAll(eventData, results);
+
+        // Check if any UI objects were hit and have the specified tag
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject.CompareTag(tag))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     //Unit coordination
     private List<Vector3> GetPositionListAround(Vector3 startPosition, float[] ringDistanceArray, int[] ringPositionCountArray)

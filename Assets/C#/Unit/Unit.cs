@@ -67,6 +67,10 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
+        if(gameMaster.selectedUnitList.Count <= 0)
+        {
+            isSelected = false;
+        }
         if (isSelected)
         {
             selectedArea.SetActive(true);
