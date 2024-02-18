@@ -24,6 +24,9 @@ public class GameMaster : MonoBehaviour
 
     private float previousTouchDistance;
 
+    //Base 
+    public bool BuildingSelected;
+
     //Interface
 
     private void Awake()
@@ -36,11 +39,14 @@ public class GameMaster : MonoBehaviour
     private void Update()
     {
         //SelectUnits_PC();
-     
+
         SelectUnits_Mobile();
         CommandUnits_Mobile();
+      
 
     }
+
+
 
     private void SelectUnits_PC()
     {
@@ -92,8 +98,6 @@ public class GameMaster : MonoBehaviour
             unit.GetComponentInChildren<SelectionArea>().isSelected = true;
         }
     }
-
-
     private void SelectUnits_Mobile()
     {
 
@@ -162,9 +166,12 @@ public class GameMaster : MonoBehaviour
                 
                 
                 selectedUnitList.Clear();
+
                 foreach (Collider2D collider in colliders)
                 {
                     Unit unit = collider.GetComponent<Unit>();
+
+                    //Units
                     if (unit != null && !unit.isEnemy)
                     {
                         if(selectedAreaTransform.gameObject.active)
@@ -172,7 +179,6 @@ public class GameMaster : MonoBehaviour
                             selectedUnitList.Add(unit);
                             unit.GetComponent<Unit>().isSelected = true;
                         }
-                      
                     }
                 }
 
@@ -187,16 +193,7 @@ public class GameMaster : MonoBehaviour
 
             camera.canMove = true;
         }
-
-
-
-
-
-
-
-
     }
-
     private void CommandUnits_Mobile()
     {
         if (Input.touchCount == 1)
@@ -210,6 +207,7 @@ public class GameMaster : MonoBehaviour
                 targetCollider = Physics2D.OverlapPoint(clickPosition);
                 var targetColliderMap = Physics2D.OverlapPoint(clickPosition);
 
+                //Set target
                 if (targetCollider != null)
                 {
                     target = targetCollider.gameObject;
@@ -255,16 +253,10 @@ public class GameMaster : MonoBehaviour
                         unit.isHarvestingNode = false;
                     }
                 }
-
-          
-
-
             }
         }
-
-
-        
     }
+
     private bool IsTouchOverUITag(Vector2 touchPosition, string tag)
     {
         // Create a PointerEventData to represent the touch input

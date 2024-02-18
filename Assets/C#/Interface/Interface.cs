@@ -9,6 +9,11 @@ public class Interface : MonoBehaviour
 {
     private GameMaster gameMaster;
 
+    [SerializeField] private GameObject unitPanel;
+    [SerializeField] private GameObject homePanel;
+
+    private bool homeSelected;
+
     //Display
     public Button clearUnits;
     public TMP_Text lumberText;
@@ -21,13 +26,13 @@ public class Interface : MonoBehaviour
     public Button clearUnitBtn;
 
     //Data
+    [SerializeField] private UnitCardData homeData;
     [SerializeField] private UnitCardData ghoulData;
 
     // Start is called before the first frame update
     void Start()
     {
         gameMaster = GameObject.Find("GameMaster").GetComponent<GameMaster>();
-
     }
 
     // Update is called once per frame
@@ -36,10 +41,19 @@ public class Interface : MonoBehaviour
         lumberCount =  gameMaster.gameMasterData.lumberCount;
         lumberText.text = lumberCount.ToString();
 
+        ManageHome();
+
+
+        UnitCards();
+
+    }
+
+    private void UnitCards()
+    {
         //Assign unit cards ---
-        foreach(GameObject unitCard in unitCards)
+        foreach (GameObject unitCard in unitCards)
         {
-            if(unitCard.GetComponent<UnitCard>().unitData != null)
+            if (unitCard.GetComponent<UnitCard>().unitData != null)
             {
                 unitCard.SetActive(true);
             }
@@ -66,7 +80,7 @@ public class Interface : MonoBehaviour
         {
             switch (u.unitType)
             {
-                case UnitType.Ghoul:
+                case UnitType.Ghoul: //Ghoul
 
                     if (unitCards.Exists(card => card.GetComponent<UnitCard>().unitTitle.text == UnitType.Ghoul.ToString()))
                     {
@@ -82,11 +96,36 @@ public class Interface : MonoBehaviour
                         foreach (GameObject card in unitCards)
                         {
                             UnitCard unitCard = card.GetComponent<UnitCard>();
-
                             if (unitCards.FindAll(card => card.GetComponent<UnitCard>().unitData != null && card.GetComponent<UnitCard>().unitTitle.text == UnitType.Ghoul.ToString()).Count < 1)
                             {
                                 Debug.Log("Assigned card");
                                 unitCard.unitData = ghoulData;
+                                return;
+                            }
+                        }
+
+                    }
+                    break;
+                case UnitType.Home: //Home
+                    if (unitCards.Exists(card => card.GetComponent<UnitCard>().unitTitle.text == UnitType.Home.ToString()))
+                    {
+                        //do count logic here
+                        homeData.unitTypeCount = gameMaster.selectedUnitList.FindAll(unit => unit.GetComponent<Unit>().unitType.ToString() == UnitType.Home.ToString()).Count;
+
+
+                        return;
+
+                    }
+                    else
+                    {
+                        foreach (GameObject card in unitCards)
+                        {
+                            UnitCard unitCard = card.GetComponent<UnitCard>();
+                            Debug.Log("Assigned card");
+                            if (unitCards.FindAll(card => card.GetComponent<UnitCard>().unitData != null && card.GetComponent<UnitCard>().unitTitle.text == UnitType.Home.ToString()).Count < 1)
+                            {
+                                Debug.Log("Assigned card");
+                                unitCard.unitData = homeData;
                                 return;
                             }
                         }
@@ -100,8 +139,27 @@ public class Interface : MonoBehaviour
         clearUnitBtn.onClick.AddListener(ClearUnitCards);
     }
 
+    private void ManageHome()
+    {
+        if (gameMaster && gameMaster.target && gameMaster.target.name == "Home") //Home - priority 1
+        {
+            Debug.Log("home selected");
+
+            gameMaster.selectedUnitList.Clear();
+
+            homePanel.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("home deselected");
+            homeSelected = false;
+            homePanel.SetActive(false);
+        }
+    }
+
     public void ClearUnitCards()
     {
+        Debug.Log("Cleared");
         gameMaster.selectedUnitList.Clear();
     }
 

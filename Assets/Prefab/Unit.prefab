@@ -651,8 +651,9 @@ MonoBehaviour:
   currentNode: {fileID: 0}
   hasResource: 0
   isHarvestingNode: 0
+  isSelected: 0
   statusBubble: {fileID: 5050415090285205770}
-  unitType: 0
+  unitType: 2
 --- !u!50 &1666530692
 Rigidbody2D:
   serializedVersion: 4

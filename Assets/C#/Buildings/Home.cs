@@ -45,7 +45,7 @@ public class Home : MonoBehaviour
         foreach(GameObject unit in units)
         {
             float dist = Vector3.Distance(unit.transform.position, transform.position);
-            if(dist <= 0.75)
+            if(dist <= 0.50)
             {
                 if(unit.GetComponent<Unit>().hasResource)
                 {
