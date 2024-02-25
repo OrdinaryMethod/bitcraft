@@ -8,6 +8,7 @@ using static UnitListEnums;
 public class Interface : MonoBehaviour
 {
     private GameMaster gameMaster;
+    private Home home;
 
     [SerializeField] private GameObject unitPanel;
     [SerializeField] private GameObject homePanel;
@@ -25,6 +26,9 @@ public class Interface : MonoBehaviour
     //Controls
     public Button clearUnitBtn;
 
+    //Home
+    public Button spawnWorm;
+
     //Data
     [SerializeField] private UnitCardData homeData;
     [SerializeField] private UnitCardData ghoulData;
@@ -33,6 +37,12 @@ public class Interface : MonoBehaviour
     void Start()
     {
         gameMaster = GameObject.Find("GameMaster").GetComponent<GameMaster>();
+        home = GameObject.Find("Home").GetComponent<Home>();
+
+        //Buttons
+        clearUnitBtn.onClick.AddListener(ClearUnitCards); //Clear unit selection
+        spawnWorm.onClick.AddListener(home.SpawnWorm); //Spawn worm at home
+
     }
 
     // Update is called once per frame
@@ -45,7 +55,6 @@ public class Interface : MonoBehaviour
 
 
         UnitCards();
-
     }
 
     private void UnitCards()
@@ -134,24 +143,18 @@ public class Interface : MonoBehaviour
                     break;
             }
         }
-        //---
-
-        clearUnitBtn.onClick.AddListener(ClearUnitCards);
     }
 
     private void ManageHome()
     {
         if (gameMaster && gameMaster.target && gameMaster.target.name == "Home") //Home - priority 1
         {
-            Debug.Log("home selected");
-
             gameMaster.selectedUnitList.Clear();
 
             homePanel.SetActive(true);
         }
         else
         {
-            Debug.Log("home deselected");
             homeSelected = false;
             homePanel.SetActive(false);
         }
@@ -161,14 +164,5 @@ public class Interface : MonoBehaviour
     {
         Debug.Log("Cleared");
         gameMaster.selectedUnitList.Clear();
-    }
-
-
-
-    void FixedUpdate()
-    {
-
-      
-
     }
 }

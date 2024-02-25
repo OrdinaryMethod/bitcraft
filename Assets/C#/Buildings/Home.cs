@@ -6,7 +6,16 @@ public class Home : MonoBehaviour
 {
     private GameMaster gameMaster;
 
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    private Color originalColor;
+
     private List<GameObject> units;
+
+    public List<Transform> spawnPoints;
+
+    [SerializeField] private float resourceCheckRange;
+    [SerializeField] private float transparencyRange;
+    [SerializeField] private float transparency;
 
 
     // Start is called before the first frame update
@@ -14,6 +23,8 @@ public class Home : MonoBehaviour
     {
         units = new List<GameObject>();
         gameMaster = GameObject.Find("GameMaster").GetComponent<GameMaster>();
+
+        originalColor = spriteRenderer.color;
 
     }
 
@@ -32,6 +43,7 @@ public class Home : MonoBehaviour
 
         //all monitoring scripting here
         ResourceCheck();
+        BecomeTransparent();
 
         //clear list
         if (units.Count >= GameObject.FindGameObjectsWithTag("Unit").Length)
@@ -45,7 +57,7 @@ public class Home : MonoBehaviour
         foreach(GameObject unit in units)
         {
             float dist = Vector3.Distance(unit.transform.position, transform.position);
-            if(dist <= 0.50)
+            if(dist <= resourceCheckRange)
             {
                 if(unit.GetComponent<Unit>().hasResource)
                 {
@@ -55,4 +67,39 @@ public class Home : MonoBehaviour
             }
         }
     }
+
+    private void BecomeTransparent()
+    {
+        foreach (GameObject unit in units)
+        {
+            float dist = Vector3.Distance(unit.transform.position, transform.position);
+            if (dist <= transparencyRange)
+            {
+                if (spriteRenderer != null)
+                {
+                    Color color = spriteRenderer.color;
+
+                    // Set the alpha value of the color
+                    color.a = transparency;
+
+                    // Assign the modified color back to the SpriteRenderer
+                    spriteRenderer.color = color;
+                }
+            }
+            else
+            {
+                // Assign the modified color back to the SpriteRenderer
+                spriteRenderer.color = originalColor;
+            }
+        } 
+    }
+
+    public void SpawnWorm()
+    {
+        int selectSpawn = Random.Range(0, spawnPoints.Count);
+        Debug.Log("spawned at: " + spawnPoints[selectSpawn].name);
+
+        //Instantiate object here
+    }
+
 }

@@ -39,7 +39,6 @@ public class GameMaster : MonoBehaviour
     private void Update()
     {
         //SelectUnits_PC();
-
         SelectUnits_Mobile();
         CommandUnits_Mobile();
       
